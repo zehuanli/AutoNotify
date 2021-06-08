@@ -1,4 +1,4 @@
-package com.upbad.apps.autonotify;
+package com.upbad.apps.autonotify.component;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -7,7 +7,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,10 +20,11 @@ import android.widget.TextView;
 
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.upbad.apps.autonotify.model.PackageData;
+import com.upbad.apps.autonotify.R;
+import com.upbad.apps.autonotify.Util;
+import com.upbad.apps.autonotify.db.PackageData;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class AppSearchActivity extends Activity {
 
@@ -62,8 +62,9 @@ public class AppSearchActivity extends Activity {
                 popupWindow.setFocusable(true);
                 popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
 
-                Button confirmButton = popupView.findViewById(R.id.confirmButton);
-                confirmButton.setOnClickListener(new View.OnClickListener() {
+                Button button = popupView.findViewById(R.id.button);
+                button.setText(R.string.select);
+                button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Intent resultIntent = new Intent();

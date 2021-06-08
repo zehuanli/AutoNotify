@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="8dp"
-    tools:context=".MainActivity">
+    tools:context=".component.MainActivity">
     <View
         android:id="@+id/centerShim"
         android:layout_height="match_parent"
@@ -24,6 +24,7 @@
         android:padding="8dp"
         android:layout_toStartOf="@id/centerShim"
         android:layout_below="@+id/addAppLabel"
+        android:textColor="@color/accent"
         android:hint="@string/app_placeholder" />
     <Button
         android:id="@+id/addAppButton"
@@ -41,11 +42,16 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/addAppButton"
         android:text="@string/current_app_label" />
-    <ListView
-        android:id="@+id/currentAppListView"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:padding="8dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/currentAppLabel" />
+        android:layout_below="@+id/currentAppLabel">
+        <ListView
+            android:id="@+id/currentAppListView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </RelativeLayout>

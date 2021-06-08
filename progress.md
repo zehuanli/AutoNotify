@@ -1,4 +1,4 @@
-- [] List apps, select targets and save the list in prefs
+- [x] List apps, select targets and save the list in db
 - [] Monitor the Car connection and enable the notification monitor when connected
 - [] Monitor all notifications and notify the car if it matches a target
 - [] UI Optimize

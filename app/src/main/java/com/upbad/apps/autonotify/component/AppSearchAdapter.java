@@ -1,4 +1,4 @@
-package com.upbad.apps.autonotify;
+package com.upbad.apps.autonotify.component;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,7 +12,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.upbad.apps.autonotify.model.PackageData;
+import com.upbad.apps.autonotify.R;
+import com.upbad.apps.autonotify.db.PackageData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,8 +61,6 @@ public class AppSearchAdapter extends ArrayAdapter<PackageData> {
         // No need to set label since it is the TextView assigned to the adapter
         ImageView appIcon = convertView.findViewById(R.id.appIcon);
         appIcon.setImageDrawable(packageData.icon);
-        TextView appUserId = convertView.findViewById(R.id.appUserId);
-        appUserId.setText(String.valueOf(packageData.userId));
         return super.getView(position, convertView, parent);
     }
 

@@ -26,10 +26,9 @@
         android:gravity="center"
         android:layout_marginTop="5dp" />
     <Button
-        android:id="@+id/confirmButton"
+        android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:layout_gravity="center"
-        android:text="@string/confirm" />
+        android:layout_gravity="center" />
 </LinearLayout>

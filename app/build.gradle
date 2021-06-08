@@ -2,8 +2,6 @@ plugins {
     id 'com.android.application'
 }
 
-def getVersionCode = { -> return 1 }
-
 android {
     compileSdkVersion 30
     buildToolsVersion "29.0.3"
@@ -12,8 +10,8 @@ android {
         applicationId "com.upbad.apps.autonotify"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode getVersionCode()
-        versionName "1." + getVersionCode()
+        versionCode 1
+        versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -36,4 +34,7 @@ dependencies {
 implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+
+    implementation "androidx.room:room-runtime:2.3.0"
+    annotationProcessor "androidx.room:room-compiler:2.3.0"
 }

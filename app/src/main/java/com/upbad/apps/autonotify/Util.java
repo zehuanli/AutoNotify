@@ -5,9 +5,11 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.UserHandle;
 import android.os.UserManager;
-import android.util.Log;
 
-import com.upbad.apps.autonotify.model.PackageData;
+import androidx.room.Room;
+
+import com.upbad.apps.autonotify.db.AppDatabase;
+import com.upbad.apps.autonotify.db.PackageData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,5 +61,9 @@ public class Util {
             }
         }
         return packageDataList;
+    }
+
+    public static AppDatabase getDatabase(Context context) {
+        return Room.databaseBuilder(context, AppDatabase.class, Config.DATABASE_FILENAME).allowMainThreadQueries().build();
     }
 }
