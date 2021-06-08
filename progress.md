@@ -1,0 +1,5 @@
+- [] List apps, select targets and save the list in prefs
+- [] Monitor the Car connection and enable the notification monitor when connected
+- [] Monitor all notifications and notify the car if it matches a target
+- [] UI Optimize
+- [] * Read notification with Google Assistant?

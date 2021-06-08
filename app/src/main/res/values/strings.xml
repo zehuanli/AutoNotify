@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">AutoNotify</string>
+    <string name="add_app_label">Add an app</string>
+    <string name="app_placeholder">Select an app …</string>
+    <string name="add">Add</string>
+    <string name="confirm">Confirm</string>
+    <string name="current_app_label">Current apps</string>
+    <string name="search_placeholder">Search</string>
+</resources>
