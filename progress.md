@@ -1,6 +1,7 @@
 - [x] List apps, select targets and save the list in db
-- [] Monitor the Car connection and enable the notification monitor when connected
+- [x] Monitor the Car connection and enable the notification monitor when connected
 - [x] Monitor all notifications and notify the car if it matches a target
 - [] UI Optimize
 - [x] Cancel notification with "Mark as Read" option offered by Android Auto?
-- [] * Read notification with Google Assistant?
+- [x] Get notification from work profile?
+- [x] * Read notification with Google Assistant? Android Auto supports it already, with every notification.
