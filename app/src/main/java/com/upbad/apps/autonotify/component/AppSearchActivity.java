@@ -69,7 +69,6 @@ public class AppSearchActivity extends Activity {
                     public void onClick(View v) {
                         Intent resultIntent = new Intent();
                         resultIntent.putExtra("packageName", packageData.packageName);
-                        resultIntent.putExtra("label", packageData.label);
                         resultIntent.putExtra("userId", packageData.userId);
                         setResult(RESULT_OK, resultIntent);
                         popupWindow.dismiss();

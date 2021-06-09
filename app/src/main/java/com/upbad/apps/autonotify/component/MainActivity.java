@@ -2,12 +2,18 @@ package com.upbad.apps.autonotify.component;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +26,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.upbad.apps.autonotify.R;
@@ -35,15 +42,10 @@ public class MainActivity extends Activity {
 
     private Context context;
     private TextView appTextView;
-    private Button addAppButton;
     SwipeRefreshLayout swipeRefreshLayout;
     private ListView currentAppListView;
 
     ArrayAdapter<PackageData> currentAppListAdapter;
-
-    private String appPackageName;
-    private String appLabel;
-    private int appUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,24 +54,12 @@ public class MainActivity extends Activity {
 
         context = this;
         appTextView = findViewById(R.id.appTextView);
-        addAppButton = findViewById(R.id.addAppButton);
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         currentAppListView = findViewById(R.id.currentAppListView);
 
         appTextView.setOnClickListener(v -> {
             Intent startIntent = new Intent(context, AppSearchActivity.class);
             startActivityForResult(startIntent, 1);
-        });
-
-        addAppButton.setOnClickListener(v -> {
-            if (appPackageName != null) {
-                AppDatabase db = Util.getDatabase(context);
-                db.packageDAO().insert(new PackageData(appPackageName, appUserId));
-                db.close();
-                reloadAppList();
-            } else {
-                Toast.makeText(context, R.string.invalid_app, Toast.LENGTH_SHORT).show();
-            }
         });
 
         swipeRefreshLayout.setOnRefreshListener(() -> {
@@ -120,16 +110,22 @@ public class MainActivity extends Activity {
         });
 
         reloadAppList();
+
+        if (!isNotificationServiceRunning()) {
+            startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             if (requestCode == 1) {
-                appPackageName = data.getStringExtra("packageName");
-                appLabel = data.getStringExtra("label");
-                appUserId = data.getIntExtra("userId", -1);
-                appTextView.setText(getResources().getString(R.string.label_userId, appLabel, appUserId));
+                String appPackageName = data.getStringExtra("packageName");
+                int appUserId = data.getIntExtra("userId", -1);
+                AppDatabase db = Util.getDatabase(context);
+                db.packageDAO().insert(new PackageData(appPackageName, appUserId));
+                db.close();
+                reloadAppList();
             }
         }
     }
@@ -140,5 +136,12 @@ public class MainActivity extends Activity {
         db.close();
         currentAppListAdapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, appList);
         currentAppListView.setAdapter(currentAppListAdapter);
+    }
+
+    private boolean isNotificationServiceRunning() {
+        ContentResolver contentResolver = getContentResolver();
+        String enabledNotificationListeners = Settings.Secure.getString(contentResolver, "enabled_notification_listeners");
+        String packageName = getPackageName();
+        return enabledNotificationListeners != null && enabledNotificationListeners.contains(packageName);
     }
 }

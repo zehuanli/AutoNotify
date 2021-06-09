@@ -18,8 +18,6 @@ import java.util.regex.Pattern;
 
 public class Util {
 
-    private static final Pattern USER_HANDLE_PATTERN = Pattern.compile("UserHandle\\{(.*)\\}");
-
     // Reference: https://github.com/ukanth/afwall/
     //   - https://github.com/ukanth/afwall/blob/12c012c4e6bc832a212d29a5783fd93f817398b9/app/src/main/java/dev/ukanth/ufirewall/Api.java#L1526
     //   - https://github.com/ukanth/afwall/blob/12c012c4e6bc832a212d29a5783fd93f817398b9/app/src/main/java/dev/ukanth/ufirewall/Api.java#L1762
@@ -30,12 +28,9 @@ public class Util {
         List<Integer> userIdList = new ArrayList<>();
         List<UserHandle> users = userManager.getUserProfiles();
         for (UserHandle user : users) {
-            Matcher matcher = USER_HANDLE_PATTERN.matcher(user.toString());
-            if (matcher.find()) {
-                int userId = Integer.parseInt(matcher.group(1));
-                if (userId >= 0) {
-                    userIdList.add(userId);
-                }
+            int userId = getUserIdFromUserHandle(user);
+            if (userId >= 0) {
+                userIdList.add(userId);
             }
         }
 
@@ -63,7 +58,29 @@ public class Util {
         return packageDataList;
     }
 
+    private static final Pattern USER_HANDLE_PATTERN = Pattern.compile("UserHandle\\{(.*)\\}");
+    public static int getUserIdFromUserHandle(UserHandle userHandle) {
+        Matcher matcher = USER_HANDLE_PATTERN.matcher(userHandle.toString());
+        if (matcher.find()) {
+            int userId = Integer.parseInt(matcher.group(1));
+            if (userId >= 0) {
+                return userId;
+            }
+        }
+        return -1;
+    }
+
     public static AppDatabase getDatabase(Context context) {
         return Room.databaseBuilder(context, AppDatabase.class, Config.DATABASE_FILENAME).allowMainThreadQueries().build();
+    }
+
+    public static String getLabelFromPackageName(Context context, String packageName) {
+        try {
+            PackageManager packageManager = context.getPackageManager();
+            ApplicationInfo applicationInfo = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA | PackageManager.GET_UNINSTALLED_PACKAGES);
+            return packageManager.getApplicationLabel(applicationInfo).toString();
+        } catch (Exception ignored) {
+        }
+        return "unknown";
     }
 }

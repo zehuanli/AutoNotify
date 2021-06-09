@@ -26,13 +26,6 @@
         android:layout_below="@+id/addAppLabel"
         android:textColor="@color/accent"
         android:hint="@string/app_placeholder" />
-    <Button
-        android:id="@+id/addAppButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:text="@string/add"
-        android:layout_below="@+id/appTextView" />
 
     <TextView
         android:id="@+id/currentAppLabel"
@@ -40,7 +33,7 @@
         android:layout_marginTop="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/addAppButton"
+        android:layout_below="@+id/appTextView"
         android:text="@string/current_app_label" />
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
