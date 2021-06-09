@@ -62,6 +62,8 @@ public class AutoNotificationListenerService extends NotificationListenerService
             Bundle notificationExtras = sbn.getNotification().extras;
             int notificationId = sbn.getId();
             String notificationKey = sbn.getKey();
+            String notificationTitle = notificationExtras.getString(Notification.EXTRA_TITLE);
+            String notificationText = notificationExtras.getString(Notification.EXTRA_TEXT);
             String label = Util.getLabelFromPackageName(this, packageName);
             Drawable iconDrawable = Util.getIconFromPackageName(this, packageName);
             Bitmap iconBitmap = Util.drawableToBitmap(iconDrawable);
@@ -81,9 +83,9 @@ public class AutoNotificationListenerService extends NotificationListenerService
                             .build();
             // Create MessagingStyle
             NotificationCompat.MessagingStyle messagingStyle = new NotificationCompat.MessagingStyle(person);
-            messagingStyle.setConversationTitle(label);
+            messagingStyle.setConversationTitle(notificationTitle);
             messagingStyle.setGroupConversation(false);
-            messagingStyle.addMessage(notificationExtras.getString(Notification.EXTRA_TEXT), sbn.getPostTime(), person);
+            messagingStyle.addMessage(notificationText, sbn.getPostTime(), person);
             // Create Reply PendingIntent (not used)
             Intent replyIntent = new Intent(this, MessagingIntentService.class);
             replyIntent.setAction(MessagingIntentService.ACTION_REPLY);
