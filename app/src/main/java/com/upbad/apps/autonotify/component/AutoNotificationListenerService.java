@@ -111,6 +111,7 @@ public class AutoNotificationListenerService extends NotificationListenerService
             // Create Notification
             Notification notification =
                     new NotificationCompat.Builder(this, getString(R.string.channel_id))
+                            .setCategory(Notification.CATEGORY_MESSAGE)
                             .setSmallIcon(iconCompat)
                             .setLargeIcon(iconBitmap)
                             .setStyle(messagingStyle)

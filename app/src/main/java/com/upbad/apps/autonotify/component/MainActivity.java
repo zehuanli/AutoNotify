@@ -112,7 +112,7 @@ public class MainActivity extends Activity {
         }
 
         String channelName = getString(R.string.channel_id);
-        NotificationChannel channel = new NotificationChannel(channelName, channelName, NotificationManager.IMPORTANCE_DEFAULT);
+        NotificationChannel channel = new NotificationChannel(channelName, channelName, NotificationManager.IMPORTANCE_HIGH);
         channel.setDescription(getString(R.string.channel_description));
         NotificationManager notificationManager = getSystemService(NotificationManager.class);
         notificationManager.createNotificationChannel(channel);
