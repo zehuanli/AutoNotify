@@ -11,19 +11,23 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.UserHandle;
 import android.os.UserManager;
+import android.util.Log;
 
 import androidx.room.Room;
 
+import com.topjohnwu.superuser.Shell;
 import com.upbad.apps.autonotify.db.AppDatabase;
 import com.upbad.apps.autonotify.db.PackageData;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Util {
 
+    // The reference below is outdated since Android permissions were changed in Android 12.
     // Reference: https://github.com/ukanth/afwall/
     //   - https://github.com/ukanth/afwall/blob/12c012c4e6bc832a212d29a5783fd93f817398b9/app/src/main/java/dev/ukanth/ufirewall/Api.java#L1526
     //   - https://github.com/ukanth/afwall/blob/12c012c4e6bc832a212d29a5783fd93f817398b9/app/src/main/java/dev/ukanth/ufirewall/Api.java#L1762
@@ -40,6 +44,8 @@ public class Util {
             }
         }
 
+        HashMap<Integer, String> pkgs = getPackagesForUser(userIdList);
+
         List<ApplicationInfo> applications = packageManager.getInstalledApplications(PackageManager.GET_META_DATA | PackageManager.GET_UNINSTALLED_PACKAGES);
 
         List<PackageData> packageDataList = new ArrayList<>();
@@ -47,8 +53,7 @@ public class Util {
             for (int userId : userIdList) {
                 try {
                     int packageUid = Integer.parseInt(userId + "" + applicationInfo.uid);
-                    String[] packages = packageManager.getPackagesForUid(packageUid);
-                    if (packages != null && packages.length > 0) {
+                    if(pkgs.containsKey(packageUid)){
                         PackageData packageData = new PackageData();
                         packageData.packageName = applicationInfo.packageName;
                         packageData.userId = userId;
@@ -62,6 +67,28 @@ public class Util {
             }
         }
         return packageDataList;
+    }
+
+    private static final Pattern dual_pattern = Pattern.compile("package:(.*) uid:(.*)", Pattern.MULTILINE);
+
+    // This is the latest reference
+    // Reference: https://github.com/ukanth/afwall/blob/30d1619e4a785afae4244a00cf9af9bc28e8e616/app/src/main/java/dev/ukanth/ufirewall/Api.java#L1697
+    public static HashMap<Integer, String> getPackagesForUser(List<Integer> userProfile) {
+        HashMap<Integer,String> listApps = new HashMap<>();
+        for(Integer integer: userProfile) {
+            Shell.Result result = Shell.cmd("pm list packages -U --user " + integer).exec();
+            List<String> out = result.getOut();
+            Matcher matcher;
+            for (String item : out) {
+                matcher = dual_pattern.matcher(item);
+                if (matcher.find() && matcher.groupCount() > 0) {
+                    String packageName = matcher.group(1);
+                    String packageId = matcher.group(2);
+                    listApps.put(Integer.parseInt(packageId), packageName);
+                }
+            }
+        }
+        return listApps;
     }
 
     private static final Pattern USER_HANDLE_PATTERN = Pattern.compile("UserHandle\\{(.*)\\}");
