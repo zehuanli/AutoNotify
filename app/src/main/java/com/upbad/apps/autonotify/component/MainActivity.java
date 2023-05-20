@@ -1,5 +1,6 @@
 package com.upbad.apps.autonotify.component;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
@@ -8,8 +9,10 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.Gravity;
@@ -22,6 +25,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -35,6 +39,7 @@ import java.util.List;
 public class MainActivity extends Activity {
 
     private static final String TAG = "MainActivity";
+    private static final int PERMISSION_REQUEST_CODE = 133;
 
     private Context context;
     private TextView appTextView;
@@ -47,6 +52,10 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (Build.VERSION.SDK_INT >= 33 && ! shouldShowRequestPermissionRationale("Post notification permission is required")) {
+            requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, PERMISSION_REQUEST_CODE);
+        }
 
         context = this;
         appTextView = findViewById(R.id.appTextView);
@@ -129,6 +138,17 @@ public class MainActivity extends Activity {
                 db.close();
                 reloadAppList();
             }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case PERMISSION_REQUEST_CODE:
+                if (grantResults.length <= 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(context, "Post notification permission not granted!", Toast.LENGTH_SHORT).show();
+                }
         }
     }
 
