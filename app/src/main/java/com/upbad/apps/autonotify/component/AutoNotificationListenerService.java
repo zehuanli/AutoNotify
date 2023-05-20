@@ -2,16 +2,12 @@ package com.upbad.apps.autonotify.component;
 
 import android.app.Notification;
 import android.app.PendingIntent;
-import android.app.UiModeManager;
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
-import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -37,7 +33,7 @@ public class AutoNotificationListenerService extends NotificationListenerService
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent.hasExtra(MessagingIntentService.NOTIFICATION_KEY_EXTRA)) {
+        if (intent != null && intent.hasExtra(MessagingIntentService.NOTIFICATION_KEY_EXTRA)) {
             String notificationKey = intent.getStringExtra(MessagingIntentService.NOTIFICATION_KEY_EXTRA);
             cancelNotification(notificationKey);
         }
@@ -71,7 +67,6 @@ public class AutoNotificationListenerService extends NotificationListenerService
     public void onNotificationPosted(StatusBarNotification sbn) {
         // Check if the phone is in car mode (not necessarily connected to Android Auto)
         if (! carConnected) {
-            Log.d(TAG, "onNotificationPosted: Not in correct mode: " + ((UiModeManager) getSystemService(Context.UI_MODE_SERVICE)).getCurrentModeType());
             return;
         }
 
@@ -79,11 +74,8 @@ public class AutoNotificationListenerService extends NotificationListenerService
         // Cancel the notification by this app itself
         if (packageName.equals(this.getPackageName())) {
             cancelNotification(sbn.getKey());
-            Log.d(TAG, "onNotificationPosted: own notification");
             return;
         }
-
-        Log.d(TAG, "onNotificationPosted: received" + packageName);
 
         int userId = Util.getUserIdFromUserHandle(sbn.getUser());
 
@@ -94,7 +86,6 @@ public class AutoNotificationListenerService extends NotificationListenerService
             String notificationKey = sbn.getKey();
             String notificationTitle = notificationExtras.getString(Notification.EXTRA_TITLE);
             String notificationText = notificationExtras.getString(Notification.EXTRA_TEXT);
-            Log.d(TAG, "onNotificationPosted: " + notificationText);
             String label = Util.getLabelFromPackageName(this, packageName);
             Drawable iconDrawable = Util.getIconFromPackageName(this, packageName);
             Bitmap iconBitmap = Util.drawableToBitmap(iconDrawable);
@@ -120,7 +111,7 @@ public class AutoNotificationListenerService extends NotificationListenerService
             // Create Reply PendingIntent (not used)
             Intent replyIntent = new Intent(this, MessagingIntentService.class);
             replyIntent.setAction(MessagingIntentService.ACTION_REPLY);
-            PendingIntent replyPendingIntent = PendingIntent.getService(this, notificationId, replyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent replyPendingIntent = PendingIntent.getService(this, notificationId, replyIntent, PendingIntent.FLAG_IMMUTABLE);
             // Create Reply Action (not used)
             NotificationCompat.Action replyAction =
                     new NotificationCompat.Action.Builder(R.drawable.ic_baseline_check_24, "Reply", replyPendingIntent)
@@ -132,7 +123,7 @@ public class AutoNotificationListenerService extends NotificationListenerService
             Intent markAsReadIntent = new Intent(this, MessagingIntentService.class);
             markAsReadIntent.setAction(MessagingIntentService.ACTION_MARK_AS_READ);
             markAsReadIntent.putExtra(MessagingIntentService.NOTIFICATION_KEY_EXTRA, notificationKey);
-            PendingIntent markAsReadPendingIntent = PendingIntent.getService(this, notificationId, markAsReadIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent markAsReadPendingIntent = PendingIntent.getService(this, notificationId, markAsReadIntent, PendingIntent.FLAG_IMMUTABLE);
             // Create Mark-as-Read Action
             NotificationCompat.Action markAsReadAction =
                     new NotificationCompat.Action.Builder(R.drawable.ic_baseline_check_24, "Mark as Read", markAsReadPendingIntent)
