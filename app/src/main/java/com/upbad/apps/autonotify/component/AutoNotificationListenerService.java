@@ -19,6 +19,7 @@ import androidx.core.app.Person;
 import androidx.core.app.RemoteInput;
 import androidx.core.graphics.drawable.IconCompat;
 
+import com.upbad.apps.autonotify.AutoConnectionDetector;
 import com.upbad.apps.autonotify.R;
 import com.upbad.apps.autonotify.Util;
 import com.upbad.apps.autonotify.db.AppDatabase;
@@ -27,6 +28,8 @@ public class AutoNotificationListenerService extends NotificationListenerService
 
     private static final String TAG = "AutoNotificationListenerService";
 
+    AutoConnectionDetector autoConnectionDetector;
+    private boolean carConnected;
     private AppDatabase db;
 
     public AutoNotificationListenerService() {
@@ -42,9 +45,33 @@ public class AutoNotificationListenerService extends NotificationListenerService
     }
 
     @Override
+    public void onListenerConnected() {
+        autoConnectionDetector = new AutoConnectionDetector(this);
+        autoConnectionDetector.setListener(new AutoConnectionDetector.OnCarConnectionStateListener() {
+            @Override
+            public void onCarConnected() {
+                carConnected = true;
+            }
+
+            @Override
+            public void onCarDisconnected() {
+                carConnected = false;
+            }
+        });
+        autoConnectionDetector.registerCarConnectionReceiver();
+    }
+
+    @Override
+    public void onDestroy() {
+        autoConnectionDetector.unRegisterCarConnectionReceiver();
+        super.onDestroy();
+    }
+
+    @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
         // Check if the phone is in car mode (not necessarily connected to Android Auto)
-        if (((UiModeManager) getSystemService(Context.UI_MODE_SERVICE)).getCurrentModeType() != Configuration.UI_MODE_TYPE_CAR) {
+        if (! carConnected) {
+            Log.d(TAG, "onNotificationPosted: Not in correct mode: " + ((UiModeManager) getSystemService(Context.UI_MODE_SERVICE)).getCurrentModeType());
             return;
         }
 
@@ -52,8 +79,11 @@ public class AutoNotificationListenerService extends NotificationListenerService
         // Cancel the notification by this app itself
         if (packageName.equals(this.getPackageName())) {
             cancelNotification(sbn.getKey());
+            Log.d(TAG, "onNotificationPosted: own notification");
             return;
         }
+
+        Log.d(TAG, "onNotificationPosted: received" + packageName);
 
         int userId = Util.getUserIdFromUserHandle(sbn.getUser());
 
@@ -64,6 +94,7 @@ public class AutoNotificationListenerService extends NotificationListenerService
             String notificationKey = sbn.getKey();
             String notificationTitle = notificationExtras.getString(Notification.EXTRA_TITLE);
             String notificationText = notificationExtras.getString(Notification.EXTRA_TEXT);
+            Log.d(TAG, "onNotificationPosted: " + notificationText);
             String label = Util.getLabelFromPackageName(this, packageName);
             Drawable iconDrawable = Util.getIconFromPackageName(this, packageName);
             Bitmap iconBitmap = Util.drawableToBitmap(iconDrawable);

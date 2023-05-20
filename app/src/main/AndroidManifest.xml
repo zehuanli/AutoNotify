@@ -7,6 +7,8 @@
         android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher_foreground"
@@ -15,23 +17,23 @@
         android:theme="@style/AppTheme">
         <activity android:name=".component.AppSearchActivity" />
 
-        <meta-data
-            android:name="com.google.android.gms.car.application"
-            android:resource="@xml/automotive_app_desc" />
-
         <activity
-            android:exported="true"
-            android:name=".component.MainActivity">
+            android:name=".component.MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
+        <meta-data
+            android:name="com.google.android.gms.car.application"
+            android:resource="@xml/automotive_app_desc" />
+
         <service
             android:name=".component.MessagingIntentService"
             android:exported="false" />
-
         <service
             android:name=".component.AutoNotificationListenerService"
             android:enabled="true"
@@ -42,6 +44,4 @@
             </intent-filter>
         </service>
     </application>
-
-
 </manifest>

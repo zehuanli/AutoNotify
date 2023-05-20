@@ -11,7 +11,6 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.UserHandle;
 import android.os.UserManager;
-import android.util.Log;
 
 import androidx.room.Room;
 
