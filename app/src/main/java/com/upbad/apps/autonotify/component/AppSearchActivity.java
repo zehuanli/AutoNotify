@@ -63,13 +63,13 @@ public class AppSearchActivity extends Activity {
                 popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
 
                 Button button = popupView.findViewById(R.id.button);
-                button.setText(R.string.select);
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Intent resultIntent = new Intent();
                         resultIntent.putExtra("packageName", packageData.packageName);
                         resultIntent.putExtra("userId", packageData.userId);
+                        resultIntent.putExtra("label", packageData.label);
                         setResult(RESULT_OK, resultIntent);
                         popupWindow.dismiss();
                         finish();

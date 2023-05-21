@@ -45,7 +45,7 @@ public class Util {
 
         HashMap<Integer, String> pkgs = getPackagesForUser(userIdList);
 
-        List<ApplicationInfo> applications = packageManager.getInstalledApplications(PackageManager.GET_META_DATA | PackageManager.GET_UNINSTALLED_PACKAGES);
+        List<ApplicationInfo> applications = packageManager.getInstalledApplications(PackageManager.GET_META_DATA | PackageManager.MATCH_UNINSTALLED_PACKAGES);
 
         List<PackageData> packageDataList = new ArrayList<>();
         for (ApplicationInfo applicationInfo : applications) {

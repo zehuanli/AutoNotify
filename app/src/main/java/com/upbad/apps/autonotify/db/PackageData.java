@@ -21,7 +21,7 @@ public class PackageData {
     @NonNull
     public int userId;
 
-    @Ignore
+    @ColumnInfo(name = "label")
     public String label;
 
     @Ignore
@@ -34,9 +34,10 @@ public class PackageData {
     }
 
     @Ignore
-    public PackageData(String packageName, int userId) {
+    public PackageData(String packageName, int userId, String label) {
         this.packageName = packageName;
         this.userId = userId;
+        this.label = label;
     }
 
     @Override

@@ -6,7 +6,7 @@
     <string name="select">Select</string>
     <string name="confirm">Confirm</string>
     <string name="delete">Delete</string>
-    <string name="confirm_delete">Remove this package from the list?</string>
+    <string name="confirm_delete">Remove this app from the list?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="current_app_label">Current apps</string>
@@ -15,4 +15,7 @@
     <string name="label_userId">%1$s (%2$d)</string>
     <string name="channel_id">Android Auto</string>
     <string name="channel_description">Notification to be displayed on Android Auto</string>
+    <string name="app_label">Name:&#160;</string>
+    <string name="user_id">User id:&#160;</string>
+    <string name="package_name">Package:&#160;</string>
 </resources>
