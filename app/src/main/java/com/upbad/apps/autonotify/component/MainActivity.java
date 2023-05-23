@@ -42,7 +42,8 @@ public class MainActivity extends Activity {
     private static final int PERMISSION_REQUEST_CODE = 133;
 
     private Context context;
-    private TextView appTextView;
+    private Button listAppButton;
+    private Button enterAppInfoButton;
     SwipeRefreshLayout swipeRefreshLayout;
     private ListView currentAppListView;
 
@@ -58,14 +59,54 @@ public class MainActivity extends Activity {
         }
 
         context = this;
-        appTextView = findViewById(R.id.appTextView);
+        listAppButton = findViewById(R.id.listAppButton);
+        enterAppInfoButton = findViewById(R.id.enterAppInfoButton);
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         currentAppListView = findViewById(R.id.currentAppListView);
 
-        appTextView.setOnClickListener(v -> {
+        listAppButton.setOnClickListener(v -> {
             findViewById(R.id.progressAnimation).setVisibility(View.VISIBLE);
             Intent startIntent = new Intent(context, AppSearchActivity.class);
             startActivityForResult(startIntent, 1);
+        });
+
+        enterAppInfoButton.setOnClickListener(view -> {
+            LayoutInflater layoutInflater = LayoutInflater.from(view.getContext());
+            View popupView = layoutInflater.inflate(R.layout.dialog_app_edit, null);
+            TextView appPackageName = popupView.findViewById(R.id.appPackageName);
+            TextView appUserIdDialog = popupView.findViewById(R.id.appUserIdDialog);
+            TextView appLabel = popupView.findViewById(R.id.appLabel);
+
+            final PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            popupWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+            popupWindow.setElevation(10);
+            popupWindow.setFocusable(true);
+            popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
+
+            Button button = popupView.findViewById(R.id.button);
+            button.setOnClickListener(v -> {
+                String packageName = appPackageName.getText().toString();
+                int userId = -1;
+                try {
+                    userId = Integer.parseInt(appUserIdDialog.getText().toString());
+                } catch (Exception ignored) {
+                }
+                if (userId < 0 || packageName.isBlank()) {
+                    new AlertDialog.Builder(context)
+                            .setTitle(R.string.error)
+                            .setMessage(R.string.enter_error_message)
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setPositiveButton(R.string.ok, null)
+                            .show();
+                    return;
+                }
+                String label = appLabel.getText().toString();
+                AppDatabase db = Util.getDatabase(context);
+                db.packageDAO().insert(new PackageData(packageName, userId, label.isBlank() ? packageName : label));
+                db.close();
+                popupWindow.dismiss();
+                reloadAppList();
+            });
         });
 
         swipeRefreshLayout.setOnRefreshListener(() -> {
@@ -155,7 +196,7 @@ public class MainActivity extends Activity {
         switch (requestCode) {
             case PERMISSION_REQUEST_CODE:
                 if (grantResults.length <= 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(context, "Post notification permission not granted!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, R.string.permission_warning, Toast.LENGTH_SHORT).show();
                 }
         }
     }

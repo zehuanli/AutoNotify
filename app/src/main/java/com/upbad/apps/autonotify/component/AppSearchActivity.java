@@ -63,6 +63,7 @@ public class AppSearchActivity extends Activity {
                 popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
 
                 Button button = popupView.findViewById(R.id.button);
+                button.setText(R.string.add);
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

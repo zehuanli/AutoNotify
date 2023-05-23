@@ -17,15 +17,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/add_app_label" />
-    <TextView
-        android:id="@+id/appTextView"
+    <Button
+        android:id="@+id/listAppButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="8dp"
         android:layout_toStartOf="@id/centerShim"
         android:layout_below="@+id/addAppLabel"
         android:textColor="@color/accent"
-        android:hint="@string/app_placeholder" />
+        android:text="@string/list_apps" />
+    <Button
+        android:id="@+id/enterAppInfoButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:layout_toStartOf="@id/centerShim"
+        android:layout_below="@+id/listAppButton"
+        android:textColor="@color/accent"
+        android:text="@string/enter_app_info" />
 
     <TextView
         android:id="@+id/currentAppLabel"
@@ -33,7 +42,7 @@
         android:layout_marginTop="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/appTextView"
+        android:layout_below="@+id/enterAppInfoButton"
         android:text="@string/current_app_label" />
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
