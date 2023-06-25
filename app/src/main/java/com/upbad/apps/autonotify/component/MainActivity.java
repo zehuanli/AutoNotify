@@ -9,6 +9,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -53,12 +54,42 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        context = this;
 
-        if (Build.VERSION.SDK_INT >= 33 && ! shouldShowRequestPermissionRationale("Post notification permission is required")) {
+        // Check if the Android Auto app is installed
+        boolean androidAutoInstalled = false;
+        PackageManager packageManager = getPackageManager();
+        try {
+            ApplicationInfo applicationInfo;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                applicationInfo = packageManager.getApplicationInfo("com.google.android.projection.gearhead", PackageManager.ApplicationInfoFlags.of(0));
+            } else {
+                applicationInfo = packageManager.getApplicationInfo("com.google.android.projection.gearhead", 0);
+            }
+            if (applicationInfo.enabled) {
+                androidAutoInstalled = true;
+            }
+        } catch (PackageManager.NameNotFoundException ignored) {
+        }
+        if (! androidAutoInstalled) {
+            new AlertDialog.Builder(context)
+                    .setTitle(R.string.error)
+                    .setMessage(R.string.android_auto_not_installed)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(R.string.ok, null)
+                    .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            finishAndRemoveTask();
+                        }
+                    })
+                    .show();
+        }
+
+        if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU && ! shouldShowRequestPermissionRationale("Post notification permission is required")) {
             requestPermissions(new String[] {Manifest.permission.POST_NOTIFICATIONS}, PERMISSION_REQUEST_CODE);
         }
 
-        context = this;
         listAppButton = findViewById(R.id.listAppButton);
         enterAppInfoButton = findViewById(R.id.enterAppInfoButton);
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);

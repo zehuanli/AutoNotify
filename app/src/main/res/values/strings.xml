@@ -26,5 +26,6 @@
     <string name="package_name_example">Example: com.example.package</string>
     <string name="error">Error</string>
     <string name="enter_error_message">Please enter valid "Package name" and "User id"</string>
+    <string name="android_auto_not_installed">To use this app, Android Auto must be installed on this device</string>
     <string name="permission_warning">WARNING: Post notification permission not granted!</string>
 </resources>

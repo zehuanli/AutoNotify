@@ -1,0 +1,1 @@
+Show warning if Android Auto is not installed on the device
