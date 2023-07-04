@@ -1,5 +1,6 @@
 package com.upbad.apps.autonotify.component;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -22,6 +23,9 @@ import com.upbad.apps.autonotify.Config;
 import com.upbad.apps.autonotify.R;
 import com.upbad.apps.autonotify.Util;
 import com.upbad.apps.autonotify.db.AppDatabase;
+import com.upbad.apps.autonotify.db.BlacklistRecord;
+
+import java.util.List;
 
 public class AutoNotificationListenerService extends NotificationListenerService {
 
@@ -31,7 +35,6 @@ public class AutoNotificationListenerService extends NotificationListenerService
 
     AutoConnectionDetector autoConnectionDetector;
     private boolean carConnected;
-    private AppDatabase db;
 
     public AutoNotificationListenerService() {
     }
@@ -70,6 +73,7 @@ public class AutoNotificationListenerService extends NotificationListenerService
         super.onDestroy();
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
         if (pref == null) {
@@ -93,13 +97,16 @@ public class AutoNotificationListenerService extends NotificationListenerService
 
         int userId = Util.getUserIdFromUserHandle(sbn.getUser());
 
-        if (getDB().packageDAO().find(sbn.getPackageName(), userId) != null) {
+        if (AppDatabase.getInstance(this).packageDAO().find(sbn.getPackageName(), userId) != null) {
             // Obtain basics
             Bundle notificationExtras = sbn.getNotification().extras;
             int notificationId = sbn.getId();
             String notificationKey = sbn.getKey();
             String notificationTitle = notificationExtras.getString(Notification.EXTRA_TITLE);
             String notificationText = notificationExtras.getString(Notification.EXTRA_TEXT);
+            if (isBlacklisted(notificationTitle, notificationText)) {
+                return;
+            }
             String label = Util.getLabelFromPackageName(this, packageName);
             Drawable iconDrawable = Util.getIconFromPackageName(this, packageName);
             Bitmap iconBitmap = Util.drawableToBitmap(iconDrawable);
@@ -158,13 +165,21 @@ public class AutoNotificationListenerService extends NotificationListenerService
         }
     }
 
-    private AppDatabase getDB() {
-        if (db == null || !db.isOpen()) {
-            db = Util.getDatabase(this);
+    private boolean isBlacklisted(String... args) {
+        AppDatabase db = AppDatabase.getInstance(this);
+        List<BlacklistRecord> blacklistRecords = db.blacklistDAO().getAll();
+        for (BlacklistRecord blacklistRecord : blacklistRecords) {
+            for (String arg : args) {
+                String argLowercase = arg.toLowerCase();
+                if (argLowercase.contains(blacklistRecord.keyword.toLowerCase())) {
+                    return true;
+                }
+            }
         }
-        return db;
+        return false;
     }
 
+    @SuppressLint("MissingPermission")
     public static void generateTestNotification(Context context) {
         IconCompat iconCompat = IconCompat.createWithResource(context, R.drawable.ic_launcher_foreground);
         // Create Person

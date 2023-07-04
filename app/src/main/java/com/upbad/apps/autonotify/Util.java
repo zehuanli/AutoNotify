@@ -15,7 +15,6 @@ import android.os.UserManager;
 import androidx.room.Room;
 
 import com.topjohnwu.superuser.Shell;
-import com.upbad.apps.autonotify.db.AppDatabase;
 import com.upbad.apps.autonotify.db.PackageData;
 
 import java.util.ArrayList;
@@ -100,10 +99,6 @@ public class Util {
             }
         }
         return -1;
-    }
-
-    public static AppDatabase getDatabase(Context context) {
-        return Room.databaseBuilder(context, AppDatabase.class, Config.DATABASE_FILENAME).allowMainThreadQueries().build();
     }
 
     public static String getLabelFromPackageName(Context context, String packageName) {

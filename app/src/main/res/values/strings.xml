@@ -32,4 +32,16 @@
     <string name="main_switch_text">Enable AutoNotify</string>
     <string name="test_notification">Generate test notification</string>
     <string name="main_switch_not_enabled">AutoNotify must be enabled to generate test notifications!</string>
+    <string name="blacklist_label">Blacklist</string>
+    <string name="blacklist_hint">Notifications with any word matched in the blacklistRecord will not be relayed</string>
+    <string name="blacklist_size_label">Current blacklistRecord size: %1$d</string>
+    <string name="add_to_blacklist_label">Add to blacklistRecord</string>
+    <string name="clear_blacklist_label">Clear blacklistRecord</string>
+    <string name="add_blacklist_title">Add to blacklistRecord</string>
+    <string name="add_blacklist_message">Please enter the keyword</string>
+    <string name="add_blacklist_hint">keyword</string>
+    <string name="add_blacklist_success">Keyword inserted to blacklistRecord!</string>
+    <string name="clear_blacklist_title">Clear blacklistRecord</string>
+    <string name="clear_blacklist_message">Are you sure to clear the entire blacklistRecord?</string>
+    <string name="clear_blacklist_success">Blacklist cleared!</string>
 </resources>

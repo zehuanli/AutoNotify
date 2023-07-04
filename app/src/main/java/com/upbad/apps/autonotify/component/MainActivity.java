@@ -24,7 +24,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.Switch;
@@ -35,8 +35,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.upbad.apps.autonotify.Config;
 import com.upbad.apps.autonotify.R;
-import com.upbad.apps.autonotify.Util;
 import com.upbad.apps.autonotify.db.AppDatabase;
+import com.upbad.apps.autonotify.db.BlacklistRecord;
 import com.upbad.apps.autonotify.db.PackageData;
 
 import java.util.List;
@@ -48,6 +48,9 @@ public class MainActivity extends Activity {
 
     private Context context;
     private Switch mainSwitch;
+    private TextView blacklistSizeLabel;
+    private Button addToBlacklistButton;
+    private Button clearBlacklistButton;
     private Button testNotificationButton;
     private Button listAppButton;
     private Button enterAppInfoButton;
@@ -107,6 +110,46 @@ public class MainActivity extends Activity {
             editor.apply();
         });
 
+        blacklistSizeLabel = findViewById(R.id.blacklistSizeLabel);
+
+        addToBlacklistButton = findViewById(R.id.addToBlacklistButton);
+        addToBlacklistButton.setOnClickListener(v -> {
+            EditText input = new EditText(context);
+            input.setHint(R.string.add_blacklist_hint);
+            new AlertDialog.Builder(context)
+                    .setTitle(R.string.add_blacklist_title)
+                    .setMessage(R.string.add_blacklist_message)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setView(input)
+                    .setPositiveButton(R.string.ok, (dialog, which) -> {
+                        String keyword = input.getText().toString();
+                        if (! keyword.trim().isEmpty()) {
+                            AppDatabase db = AppDatabase.getInstance(context);
+                            db.blacklistDAO().insert(new BlacklistRecord(keyword));
+                            Toast.makeText(context, R.string.add_blacklist_success, Toast.LENGTH_SHORT).show();
+                            reloadBlacklistSize();
+                        }
+                    })
+                    .setNegativeButton(R.string.no, null)
+                    .show();
+        });
+
+        clearBlacklistButton = findViewById(R.id.clearBlacklistButton);
+        clearBlacklistButton.setOnClickListener(v -> {
+            new AlertDialog.Builder(context)
+                    .setTitle(R.string.clear_blacklist_title)
+                    .setMessage(R.string.clear_blacklist_message)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(R.string.yes, (dialog, which) -> {
+                        AppDatabase db = AppDatabase.getInstance(context);
+                        db.blacklistDAO().deleteAll();
+                        Toast.makeText(context, R.string.clear_blacklist_success, Toast.LENGTH_SHORT).show();
+                        reloadBlacklistSize();
+                    })
+                    .setNegativeButton(R.string.no, null)
+                    .show();
+        });
+
         testNotificationButton = findViewById(R.id.testNotificationButton);
         testNotificationButton.setOnClickListener(v -> {
             if (! pref.getBoolean(Config.PREFERENCE_ENABLED, true)) {
@@ -158,9 +201,8 @@ public class MainActivity extends Activity {
                     return;
                 }
                 String label = appLabel.getText().toString();
-                AppDatabase db = Util.getDatabase(context);
+                AppDatabase db = AppDatabase.getInstance(context);
                 db.packageDAO().insert(new PackageData(packageName, userId, label.isBlank() ? packageName : label));
-                db.close();
                 popupWindow.dismiss();
                 reloadAppList();
             });
@@ -200,9 +242,8 @@ public class MainActivity extends Activity {
                             .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    AppDatabase db = Util.getDatabase(context);
+                                    AppDatabase db = AppDatabase.getInstance(context);
                                     db.packageDAO().delete(packageData.packageName, packageData.userId);
-                                    db.close();
                                     popupWindow.dismiss();
                                     reloadAppList();
                                 }
@@ -214,6 +255,7 @@ public class MainActivity extends Activity {
         });
 
         reloadAppList();
+        reloadBlacklistSize();
 
         if (!isNotificationServiceRunning()) {
             startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
@@ -239,9 +281,8 @@ public class MainActivity extends Activity {
                 String appPackageName = data.getStringExtra("packageName");
                 int appUserId = data.getIntExtra("userId", -1);
                 String label = data.getStringExtra("label");
-                AppDatabase db = Util.getDatabase(context);
+                AppDatabase db = AppDatabase.getInstance(context);
                 db.packageDAO().insert(new PackageData(appPackageName, appUserId, label));
-                db.close();
                 reloadAppList();
             }
         }
@@ -259,11 +300,15 @@ public class MainActivity extends Activity {
     }
 
     private void reloadAppList() {
-        AppDatabase db = Util.getDatabase(context);
+        AppDatabase db = AppDatabase.getInstance(context);
         List<PackageData> appList = db.packageDAO().getAll();
-        db.close();
         currentAppListAdapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, appList);
         currentAppListView.setAdapter(currentAppListAdapter);
+    }
+
+    private void reloadBlacklistSize() {
+        AppDatabase db = AppDatabase.getInstance(context);
+        blacklistSizeLabel.setText(getString(R.string.blacklist_size_label, db.blacklistDAO().count()));
     }
 
     private boolean isNotificationServiceRunning() {

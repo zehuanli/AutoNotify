@@ -5,12 +5,12 @@
     android:layout_height="match_parent"
     android:padding="8dp"
     tools:context=".component.MainActivity">
-<!--    <View-->
-<!--        android:id="@+id/centerShim"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:visibility="invisible"-->
-<!--        android:layout_centerHorizontal="true" />-->
+    <View
+        android:id="@+id/centerShim"
+        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:visibility="invisible"
+        android:layout_centerHorizontal="true" />
     <TextView
         android:id="@+id/mainControlLabel"
         android:padding="8dp"
@@ -32,11 +32,50 @@
         android:textColor="@color/accent"
         android:text="@string/test_notification" />
     <TextView
-        android:id="@+id/addAppLabel"
+        android:id="@+id/blacklistLabel"
         android:padding="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/testNotificationButton"
+        android:text="@string/blacklist_label" />
+    <TextView
+        android:id="@+id/blacklistHintLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/blacklistLabel"
+        android:textSize="12sp"
+        android:text="@string/blacklist_hint" />
+    <TextView
+        android:id="@+id/blacklistSizeLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/blacklistHintLabel"
+        android:textSize="12sp"
+        android:text="@string/blacklist_size_label" />
+    <Button
+        android:id="@+id/addToBlacklistButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:layout_below="@+id/blacklistSizeLabel"
+        android:layout_toStartOf="@id/centerShim"
+        android:textColor="@color/accent"
+        android:text="@string/add_to_blacklist_label" />
+    <Button
+        android:id="@+id/clearBlacklistButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:layout_below="@+id/blacklistSizeLabel"
+        android:layout_toEndOf="@id/centerShim"
+        android:textColor="@color/accent"
+        android:text="@string/clear_blacklist_label" />
+    <TextView
+        android:id="@+id/addAppLabel"
+        android:padding="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/clearBlacklistButton"
         android:text="@string/add_app_label" />
     <Button
         android:id="@+id/listAppButton"
