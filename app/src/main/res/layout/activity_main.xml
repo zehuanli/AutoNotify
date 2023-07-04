@@ -5,24 +5,44 @@
     android:layout_height="match_parent"
     android:padding="8dp"
     tools:context=".component.MainActivity">
-    <View
-        android:id="@+id/centerShim"
-        android:layout_height="match_parent"
-        android:layout_width="0dp"
-        android:visibility="invisible"
-        android:layout_centerHorizontal="true"/>
+<!--    <View-->
+<!--        android:id="@+id/centerShim"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:visibility="invisible"-->
+<!--        android:layout_centerHorizontal="true" />-->
+    <TextView
+        android:id="@+id/mainControlLabel"
+        android:padding="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/main_control_label" />
+    <Switch
+        android:id="@+id/mainSwitch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/mainControlLabel"
+        android:text="@string/main_switch_text" />
+    <Button
+        android:id="@+id/testNotificationButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:layout_below="@+id/mainSwitch"
+        android:textColor="@color/accent"
+        android:text="@string/test_notification" />
     <TextView
         android:id="@+id/addAppLabel"
         android:padding="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/testNotificationButton"
         android:text="@string/add_app_label" />
     <Button
         android:id="@+id/listAppButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="8dp"
-        android:layout_toStartOf="@id/centerShim"
         android:layout_below="@+id/addAppLabel"
         android:textColor="@color/accent"
         android:text="@string/list_apps" />
@@ -31,7 +51,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="8dp"
-        android:layout_toStartOf="@id/centerShim"
         android:layout_below="@+id/listAppButton"
         android:textColor="@color/accent"
         android:text="@string/enter_app_info" />

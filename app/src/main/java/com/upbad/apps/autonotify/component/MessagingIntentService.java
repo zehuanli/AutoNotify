@@ -35,8 +35,10 @@ public class MessagingIntentService extends IntentService {
      * @param notificationKey
      */
     private void handleActionMarkAsRead(String notificationKey) {
-        Intent intent = new Intent(this, AutoNotificationListenerService.class);
-        intent.putExtra(NOTIFICATION_KEY_EXTRA, notificationKey);
-        startService(intent);
+        if (! notificationKey.isEmpty()) {
+            Intent intent = new Intent(this, AutoNotificationListenerService.class);
+            intent.putExtra(NOTIFICATION_KEY_EXTRA, notificationKey);
+            startService(intent);
+        }
     }
 }

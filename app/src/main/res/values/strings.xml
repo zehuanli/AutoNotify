@@ -28,4 +28,8 @@
     <string name="enter_error_message">Please enter valid "Package name" and "User id"</string>
     <string name="android_auto_not_installed">To use this app, Android Auto must be installed on this device</string>
     <string name="permission_warning">WARNING: Post notification permission not granted!</string>
+    <string name="main_control_label">Main control</string>
+    <string name="main_switch_text">Enable AutoNotify</string>
+    <string name="test_notification">Generate test notification</string>
+    <string name="main_switch_not_enabled">AutoNotify must be enabled to generate test notifications!</string>
 </resources>

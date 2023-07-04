@@ -2,7 +2,9 @@ package com.upbad.apps.autonotify.component;
 
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -16,6 +18,7 @@ import androidx.core.app.RemoteInput;
 import androidx.core.graphics.drawable.IconCompat;
 
 import com.upbad.apps.autonotify.AutoConnectionDetector;
+import com.upbad.apps.autonotify.Config;
 import com.upbad.apps.autonotify.R;
 import com.upbad.apps.autonotify.Util;
 import com.upbad.apps.autonotify.db.AppDatabase;
@@ -23,6 +26,8 @@ import com.upbad.apps.autonotify.db.AppDatabase;
 public class AutoNotificationListenerService extends NotificationListenerService {
 
     private static final String TAG = "AutoNotificationListenerService";
+
+    private SharedPreferences pref;
 
     AutoConnectionDetector autoConnectionDetector;
     private boolean carConnected;
@@ -35,7 +40,9 @@ public class AutoNotificationListenerService extends NotificationListenerService
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null && intent.hasExtra(MessagingIntentService.NOTIFICATION_KEY_EXTRA)) {
             String notificationKey = intent.getStringExtra(MessagingIntentService.NOTIFICATION_KEY_EXTRA);
-            cancelNotification(notificationKey);
+            if (! notificationKey.isEmpty()) {
+                cancelNotification(notificationKey);
+            }
         }
         return START_STICKY;
     }
@@ -65,6 +72,13 @@ public class AutoNotificationListenerService extends NotificationListenerService
 
     @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
+        if (pref == null) {
+            pref = getSharedPreferences(Config.SHARED_PREFERENCE_STRING, MODE_PRIVATE);
+        }
+        if (! pref.getBoolean(Config.PREFERENCE_ENABLED, true)) {
+            return;
+        }
+
         // Check if the phone is in car mode (not necessarily connected to Android Auto)
         if (! carConnected) {
             return;
@@ -72,7 +86,7 @@ public class AutoNotificationListenerService extends NotificationListenerService
 
         String packageName = sbn.getPackageName();
         // Cancel the notification by this app itself
-        if (packageName.equals(this.getPackageName())) {
+        if (packageName.equals(this.getPackageName()) && sbn.getId() != -1) {
             cancelNotification(sbn.getKey());
             return;
         }
@@ -149,5 +163,52 @@ public class AutoNotificationListenerService extends NotificationListenerService
             db = Util.getDatabase(this);
         }
         return db;
+    }
+
+    public static void generateTestNotification(Context context) {
+        IconCompat iconCompat = IconCompat.createWithResource(context, R.drawable.ic_launcher_foreground);
+        // Create Person
+        Person person =
+                new Person.Builder()
+                        .setName("Test app")
+                        .setIcon(iconCompat)
+                        .build();
+        // Create MessagingStyle
+        NotificationCompat.MessagingStyle messagingStyle = new NotificationCompat.MessagingStyle(person);
+        messagingStyle.setConversationTitle("Test notification");
+        messagingStyle.setGroupConversation(false);
+        messagingStyle.addMessage("This is a test message from AutoNotify", System.currentTimeMillis(), person);
+        // Create Reply PendingIntent (not used)
+        Intent replyIntent = new Intent(context, MessagingIntentService.class);
+        replyIntent.setAction(MessagingIntentService.ACTION_REPLY);
+        PendingIntent replyPendingIntent = PendingIntent.getService(context, -1, replyIntent, PendingIntent.FLAG_IMMUTABLE);
+        // Create Reply Action (not used)
+        NotificationCompat.Action replyAction =
+                new NotificationCompat.Action.Builder(R.drawable.ic_baseline_check_24, "Reply", replyPendingIntent)
+                        .setSemanticAction(NotificationCompat.Action.SEMANTIC_ACTION_REPLY)
+                        .setShowsUserInterface(false)
+                        .addRemoteInput(new RemoteInput.Builder("N/A").build())
+                        .build();
+        // Create Mark-as-Read PendingIntent
+        Intent markAsReadIntent = new Intent(context, MessagingIntentService.class);
+        markAsReadIntent.setAction(MessagingIntentService.ACTION_MARK_AS_READ);
+        markAsReadIntent.putExtra(MessagingIntentService.NOTIFICATION_KEY_EXTRA, "");
+        PendingIntent markAsReadPendingIntent = PendingIntent.getService(context, -1, markAsReadIntent, PendingIntent.FLAG_IMMUTABLE);
+        // Create Mark-as-Read Action
+        NotificationCompat.Action markAsReadAction =
+                new NotificationCompat.Action.Builder(R.drawable.ic_baseline_check_24, "Mark as Read", markAsReadPendingIntent)
+                        .setSemanticAction(NotificationCompat.Action.SEMANTIC_ACTION_MARK_AS_READ)
+                        .setShowsUserInterface(false)
+                        .build();
+        // Create Notification
+        Notification notification =
+                new NotificationCompat.Builder(context, context.getString(R.string.channel_id))
+                        .setCategory(Notification.CATEGORY_MESSAGE)
+                        .setSmallIcon(iconCompat)
+                        .setStyle(messagingStyle)
+                        .addInvisibleAction(replyAction)
+                        .addAction(markAsReadAction)
+                        .build();
+        NotificationManagerCompat.from(context).notify(-1, notification);
     }
 }

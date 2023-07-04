@@ -9,6 +9,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -23,13 +24,16 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.upbad.apps.autonotify.Config;
 import com.upbad.apps.autonotify.R;
 import com.upbad.apps.autonotify.Util;
 import com.upbad.apps.autonotify.db.AppDatabase;
@@ -43,6 +47,8 @@ public class MainActivity extends Activity {
     private static final int PERMISSION_REQUEST_CODE = 133;
 
     private Context context;
+    private Switch mainSwitch;
+    private Button testNotificationButton;
     private Button listAppButton;
     private Button enterAppInfoButton;
     SwipeRefreshLayout swipeRefreshLayout;
@@ -89,6 +95,26 @@ public class MainActivity extends Activity {
         if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU && ! shouldShowRequestPermissionRationale("Post notification permission is required")) {
             requestPermissions(new String[] {Manifest.permission.POST_NOTIFICATIONS}, PERMISSION_REQUEST_CODE);
         }
+
+        SharedPreferences pref = getSharedPreferences(Config.SHARED_PREFERENCE_STRING, Context.MODE_PRIVATE);
+
+        mainSwitch = findViewById(R.id.mainSwitch);
+        mainSwitch.setChecked(pref.getBoolean(Config.PREFERENCE_ENABLED, true));
+
+        mainSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            SharedPreferences.Editor editor = pref.edit();
+            editor.putBoolean(Config.PREFERENCE_ENABLED, isChecked);
+            editor.apply();
+        });
+
+        testNotificationButton = findViewById(R.id.testNotificationButton);
+        testNotificationButton.setOnClickListener(v -> {
+            if (! pref.getBoolean(Config.PREFERENCE_ENABLED, true)) {
+                Toast.makeText(this, R.string.main_switch_not_enabled, Toast.LENGTH_SHORT).show();
+            } else {
+                AutoNotificationListenerService.generateTestNotification(this);
+            }
+        });
 
         listAppButton = findViewById(R.id.listAppButton);
         enterAppInfoButton = findViewById(R.id.enterAppInfoButton);
