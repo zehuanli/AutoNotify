@@ -15,7 +15,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract BlacklistDAO blacklistDAO();
 
     public static synchronized AppDatabase getInstance(Context context) {
-        if (instance == null) {
+        if (instance == null || ! instance.isOpen()) {
             instance = Room.databaseBuilder(context, AppDatabase.class, Config.DATABASE_FILENAME).allowMainThreadQueries().build();
         }
         return instance;
